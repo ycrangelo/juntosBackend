@@ -98,27 +98,26 @@ const s3 = new S3Client({
 });
 
 app.get('/get-presigned-url', async (req, res) => {
-  const fileName = `images/${Date.now()}.jpg`;
-  
-  const command = new PutObjectCommand({
-    Bucket: process.env.AWS_S3_BUCKET,
-    Key: fileName,
-    ContentType: "image/jpeg",
-    ACL: "public-read",
-  });
+  try {
+    const fileName = `images/${Date.now()}.jpg`;
+    
+    const command = new PutObjectCommand({
+      Bucket: process.env.AWS_S3_BUCKET,
+      Key: fileName,
+      ContentType: "image/jpeg",  // Ensures correct MIME type
+      ACL: "public-read",        // Remove if you want private uploads
+    });
 
-  const url = await getSignedUrl(s3, command, { expiresIn: 60 });
-  res.json({ url });
-});
-app.use('/api/users', userRoutes);
-app.use('/api/comment', commentRoutes);
-app.use('/api/saves', savePostRoutes);
-app.use('/api/post', postRoutes);
+    const url = await getSignedUrl(s3, command, { expiresIn: 3600 }); // 1 hour expiry
+    res.json({ url }); // ✅ Always return JSON
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Internal server error' });
+  } catch (error) {
+    console.error("S3 Error:", error);
+    res.status(500).json({ 
+      error: "Failed to generate URL",
+      details: error.message 
+    });
+  }
 });
 
 // Start server
