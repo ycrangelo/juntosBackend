@@ -120,6 +120,19 @@ app.get('/get-presigned-url', async (req, res) => {
   }
 });
 
+
+
+app.use('/api/users', userRoutes);
+app.use('/api/comment', commentRoutes);
+app.use('/api/saves', savePostRoutes);
+app.use('/api/post', postRoutes);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
 // Start server
 const server = app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
