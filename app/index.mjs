@@ -5,7 +5,8 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 // import { createRouteHandler } from 'uploadthing/express';
-const AWS = require('aws-sdk');
+import AWS from 'aws-sdk';
+
 
 dotenv.config();
 //import models
