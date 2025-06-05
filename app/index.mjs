@@ -5,7 +5,9 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 // import { createRouteHandler } from 'uploadthing/express';
-import AWS from 'aws-sdk';
+// import AWS from 'aws-sdk';
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 
 dotenv.config();
@@ -16,7 +18,7 @@ import userRoutes from './routes/userRoutes.mjs';
 import commentRoutes from './routes/commentRoutes.mjs'
 import savePostRoutes from './routes/savePostRoutes.mjs'
 import postRoutes from './routes/postRoutes.mjs'
-import { uploadRouter } from './uploadthing.mjs';
+// import { uploadRouter } from './uploadthing.mjs';
 
 const app = express();
 app.use(express.json());
@@ -86,32 +88,27 @@ const upload = multer();
 //   })
 // );
 // AWS Configuration
-AWS.config.update({
+// ✅ Use this instead (v3 style)
+const s3 = new S3Client({ 
   region: process.env.AWS_REGION,
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+  }
 });
-const s3 = new AWS.S3();
 
-app.get('/get-presigned-url', (req, res) => {
-  const fileName = `image_${Date.now()}.jpg`;
-  const s3Path = `ycrangelojuntos/images/${fileName}`;
+app.get('/get-presigned-url', async (req, res) => {
+  const fileName = `images/${Date.now()}.jpg`;
   
-  const params = {
-    Bucket: "ycrangelojuntos",
-    Key: s3Path,
-    Expires: 60, // URL expires in 60 seconds
-    ContentType: 'image/jpeg',
-    ACL: 'public-read'
-  };
-
-  s3.getSignedUrl('putObject', params, (err, url) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ error: 'Error generating pre-signed URL' });
-    }
-    res.json({ url });
+  const command = new PutObjectCommand({
+    Bucket: process.env.AWS_S3_BUCKET,
+    Key: fileName,
+    ContentType: "image/jpeg",
+    ACL: "public-read",
   });
+
+  const url = await getSignedUrl(s3, command, { expiresIn: 60 });
+  res.json({ url });
 });
 app.use('/api/users', userRoutes);
 app.use('/api/comment', commentRoutes);
