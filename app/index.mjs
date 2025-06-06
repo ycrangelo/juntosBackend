@@ -105,7 +105,7 @@ app.get('/get-presigned-url', async (req, res) => {
       Bucket: process.env.AWS_S3_BUCKET,
       Key: fileName,
       ContentType: "image/jpeg",  // Ensures correct MIME type
-      ACL: "public-read",        // Remove if you want private uploads
+      // ACL: "public-read",        // Remove if you want private uploads
     });
 
     const url = await getSignedUrl(s3, command, { expiresIn: 3600 }); // 1 hour expiry
