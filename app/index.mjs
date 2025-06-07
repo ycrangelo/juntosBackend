@@ -99,24 +99,19 @@ const s3 = new S3Client({
 
 app.get('/get-presigned-url', async (req, res) => {
   try {
-    const fileName = `images/${Date.now()}.jpg`;
-    
+    const fileType = req.query.type || 'jpg'; // Default to JPEG
+    const fileName = `images/${Date.now()}.${fileType}`;
+
     const command = new PutObjectCommand({
       Bucket: process.env.AWS_S3_BUCKET,
       Key: fileName,
-      ContentType: "image/jpeg",  // Ensures correct MIME type
-      // ACL: "public-read",        // Remove if you want private uploads
+      ContentType: `image/${fileType === 'jpg' ? 'jpeg' : fileType}`, // Correct MIME type
     });
 
-    const url = await getSignedUrl(s3, command, { expiresIn: 3600 }); // 1 hour expiry
-    res.json({ url }); // ✅ Always return JSON
-
+    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+    res.json({ url, fileName });
   } catch (error) {
-    console.error("S3 Error:", error);
-    res.status(500).json({ 
-      error: "Failed to generate URL",
-      details: error.message 
-    });
+    res.status(500).json({ error: error.message });
   }
 });
 
