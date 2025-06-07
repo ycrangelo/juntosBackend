@@ -16,7 +16,7 @@ route.get('/getAllPost', async (req, res) => {
 
 //creating a post
 route.post('/createPost', async (req, res) => {
-  const {userId,thoughts,picture,username } = req.body;
+  const {userId,thoughts,picture,username,profile } = req.body;
 
   if (!userId || !thoughts) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -25,6 +25,7 @@ route.post('/createPost', async (req, res) => {
     const newPost = new Post({
       userId,
       username,
+      profile,
       thoughts,
       picture,
     });
