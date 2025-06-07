@@ -3,6 +3,18 @@ import Post from '../../models/postModel.mjs';
 
 const route = express.Router();
 
+route.post('/getUserPost/', async (req, res) => {
+  const { userId } = req.body;
+
+  try {
+
+    const userPosts = await Post.find({userId: { $in: userId } }).sort({ createdAt: -1 });
+
+    res.json(userPosts);
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 //fetch all post
 route.get('/getAllPost', async (req, res) => {
