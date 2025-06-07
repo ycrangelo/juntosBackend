@@ -22,7 +22,7 @@ route.post('/login', async (req, res) => {
     }
 
     // If matched
-    res.json({ message: 'Login successful', user: { username: user.username, id: user._id } });
+    res.json({ message: 'Login successful', user: { username: user.username, id: user._id, profile:user.profile } });
 
   } catch (err) {
     res.status(500).json({ error: 'Internal server error' });
