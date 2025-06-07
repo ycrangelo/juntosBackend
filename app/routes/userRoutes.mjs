@@ -32,7 +32,7 @@ route.post('/login', async (req, res) => {
 
 //user sign up
 route.post('/singup', async (req, res) => {
-  const { username, fullname, password, gender, contactNumber } = req.body;
+  const { username, fullname, password, gender, contactNumber,profile } = req.body;
 
   if (!username  || !password) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -42,6 +42,7 @@ route.post('/singup', async (req, res) => {
       username,
       fullname,
       gender,
+      profile,
       contactNumber,
       password
     });

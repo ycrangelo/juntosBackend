@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
   fullname: String,
   gender: String,
   contactNumber: String,
+  profile:String,
   createdAt: {
     type: Date,
     default: Date.now,

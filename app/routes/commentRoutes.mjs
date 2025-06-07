@@ -18,7 +18,7 @@ route.post('/getComments', async (req, res) => {
 
 //creating a comment
 route.post('/createComment', async (req, res) => {
-  const {userId,postId,comment,username } = req.body;
+  const {userId,postId,comment,username,profile } = req.body;
 
   if (!userId || !postId || !comment) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -27,6 +27,7 @@ route.post('/createComment', async (req, res) => {
     const newComment = new comments({
       userId,
       username,
+      profile,
       postId,
       comment,
     });
